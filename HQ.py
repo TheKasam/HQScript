@@ -4,6 +4,7 @@ from os.path import join, basename
 from sys import argv
 import json
 import requests
+import bs4 as bs
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 RESULTS_DIR = 'jsons'
@@ -14,6 +15,25 @@ def main():
 
 
 
+   #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+    #print(ans.json()['queries']['request'])
+
+def get_ans(question, answers):
+
+    search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
+    search_id = '016671866865682481259:ivh1ljytmsm'
+    q = 'What is the Epipremnum aureum house plant known as?'
+    ans = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+
+    questionWord = question.strip().split(" ")[0]
+
+    #other method is to get request with actual url and use bs4 to locate the answer google gives a
+    if questionWord == 'What' or questionWord == "Of":
+        googleResult = requests.get('https://www.google.com/search?q='+q)
+
+        soup = bs.BeautifulSoup(googleResult.text,'lxml')
+        b = soup.find('div',{'class':'_sPg'})
+        print(b)
 
 
 def get_text():
@@ -48,7 +68,7 @@ def get_text():
 
                 answers = textLst[2:5]
                 print(answers)
-
+                get_ans(question, answers)
 
 def make_image_data_list(image_filenames):
     """
@@ -80,6 +100,22 @@ def request_ocr(api_key, image_filenames):
                              params={'key': api_key},
                              headers={'Content-Type': 'application/json'})
     return response
+
+def request_search(api_key):
+
+ response = requests.post(ENDPOINT_URL,
+                          data=make_image_data(image_filenames),
+                          params={'key': api_key},
+                          headers={'Content-Type': 'application/json'})
+ return response
+
+
+
+
+
+
+
+
 
 
 
