@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "hqgame-189607",
+  "private_key_id": "4b7914eab80c4cac8eecb3259175f8040993c043",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCsMmeDnR7gFlZc\nn3xYhQwuoqsYngY/ar48HZM5zkfzdN/TNDCY5W+rD0dt/mNKaznuuq+VR+Yf+ncA\nTYv92UBofi7LimS8MYcdxTEs/qe0ZpFcFravrBU/5rqPYJM3flmxajwugV8CJRzz\nuG25nt7ATdub6IGlwVYGH024EMK3C+k62lndzdzNBIH8o4q8rCl0keg6Di57DSf+\nt9LkBoZuP4Dcbs8oo2VvfJ4A0dk1oDCR5N4QRMsXIi9ao3UyhjeFFssdmog2D05N\nWEtUzMc7KnggBM2P884uW3P+bM4K8QqOODjMFkRQoFyTVZpl/EI9BMCERrqhsPrV\nyMRenZ3BAgMBAAECggEAEXcqUyniWhHB8DKX+uWByxAiQQS0NwX1ZiUMzAntd9bU\npfgu7q8k0Kmj0dcBzKhMD7f9O6u3fmpZ3BzBdH2u3/pedjQjDAiM/xrDZmAs8+oM\nV9YQ8QgH/ruBFC5UOEZ3Q/y1vnTORWoswdakwHVJ/CDZg7qFPeH6fvP5XtBKY6Tl\nuUrNwfWobFaVKA+yCfIGdCh9nItA1E3tnRSKmJXI0WV0DARDJs2239BnDDY2wXcc\n3GXVsZUdOibNbdWfW66OKIY0on4IeeN099+VNRWf2PwYcHvNaVSqxTpAfwgcdOsq\n6IPZpo/WyJhacz1iicuzffldDA0AyOIR57pSdfPgPQKBgQDeaJAXfAMVplRQV7/B\nDNSl/Y2yTx+Il1uXREYlh+30Rgw4TjyVFJ1V2/rKG8cPUKIvm8475PZL9UE4GkvE\nWzeYPqigOym88f0YuhHmg9WuefDPyzFt2jC9HoyHn5bLyf4OdQ0bLSYaxe3p8cuq\ngaO+CQ3P4NzeoCCXy0Y4o7l9PQKBgQDGNGiMFYqQO6EHq4AV6pIIJsnCDXG/kLCi\ndATCC6iGBMwVJwoBCgZ6RedyiBLFhDdYbn+w7qDkHsl63IRbg+cZFgaaKGavjzYA\nkeB/RIcHZp4v1VdSElKss/6S0ZkcpJ0l1qXgYVkTSz406WO91qU9ps3HgEJ1SfZ9\npDj2CESy1QKBgQCBKWBlAxQXgpz8e7lUt8rXC0U7BFBf1ubOFkxWh3ZdokB+gpEU\nUwB8WGBw92jHMCDAXU+L4RBYVHonxr2xrve+ZsUvKKy4miBON+ElafKyfQao5mwy\nS8B6VD9wk/HTL99nLfsKiVHTwpbEgjOxNdCOEFwBGamrcHr9LIP/aLXUUQKBgQCG\ndUkzNu3QGNON63cx5vZ4FzApt4sh5JsfKcuMg/IoMJruApTTzaRFUKTJWqw5WA9f\nq15ufgOhnY0bDvuvRZUBvKJv89ZtZJ7C1jNQwwFDMQdA9d6N66YwSM77dLsE5ltB\nLxNKW1/dKd8ib+3c+/8PCthwbX8oKCvSYhTOOx+3nQKBgQCkbrouysRdzGzxB0XX\niug2Rebc428H1x6NCQfA/AT+084Za5weDDOVdNodkq45nmd47oLun41zuUKmABUy\nPhZNCEuwIlisQe+n4ZxmnN3clhMyk8VQOiQsurorMXy1ls4sxtNcL9kYmXWAB7RC\nc2aBPfEZ7VSlYnUVssC68BZ2KA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "hqgameaccount@hqgame-189607.iam.gserviceaccount.com",
+  "client_id": "102740033414809726103",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/hqgameaccount%40hqgame-189607.iam.gserviceaccount.com"
+}
