@@ -1,3 +1,5 @@
+import time
+start = time.time()
 from base64 import b64encode
 from os import makedirs
 from os.path import join, basename
@@ -14,7 +16,8 @@ def main():
     get_text()
 
 
-
+    end = time.time()
+    print(end - start)
    #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
     #print(ans.json()['queries']['request'])
 
@@ -22,7 +25,7 @@ def get_ans(question, answers):
 
     search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
     search_id = '016671866865682481259:ivh1ljytmsm'
-    q = 'What is the Epipremnum aureum house plant known as?'
+    q = 'How much caffene is too much?'
     ans = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
 
     questionWord = question.strip().split(" ")[0]
@@ -32,7 +35,9 @@ def get_ans(question, answers):
         googleResult = requests.get('https://www.google.com/search?q='+q)
 
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
+        
         b = soup.find('div',{'class':'_sPg'})
+        b = str(b.text).replace("<b>","")
         print(b)
 
 
@@ -68,6 +73,7 @@ def get_text():
 
                 answers = textLst[2:5]
                 print(answers)
+                print()
                 get_ans(question, answers)
 
 def make_image_data_list(image_filenames):
