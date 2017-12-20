@@ -25,7 +25,7 @@ def get_ans(question, answers):
 
     search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
     search_id = '016671866865682481259:ivh1ljytmsm'
-    q = 'How much caffene is too much?'
+    q = 'what is the epipremnum aureum house plant known as?'
     ans = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
 
     questionWord = question.strip().split(" ")[0]
@@ -35,15 +35,29 @@ def get_ans(question, answers):
         googleResult = requests.get('https://www.google.com/search?q='+q)
 
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
-        
-        b = soup.find('div',{'class':'_sPg'})
-        b = str(b.text).replace("<b>","")
-        print(b)
+
+        if soup != None:
+            headText = soup.find('div',{'class':'_sPg'})
+            headText = str(headText.text).split(" ")
+            freqDict = {}
+            for x in answers:
+                freqDict[x] = 0
+
+            for x in headText:
+                if answers[0] in x:
+                    freqDict[answers[0]] += 1
+                elif answers[1] in x:
+                    freqDict[answers[1]] += 1
+                elif answers[2] in x:
+                    freqDict[answers[2]] += 1
+            print(headText)
+            print()
+            print(freqDict)
 
 
 def get_text():
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
-    image_filenames = ['imageTest.png']
+    image_filenames = ['imageTest4.png']
     if not api_key or not image_filenames:
         print("""
             Please supply an api key, then one or more image filenames
@@ -54,25 +68,26 @@ def get_text():
             print(response.text)
         else:
             for idx, resp in enumerate(response.json()['responses']):
-                # save to JSON file
-                # imgname = image_filenames[idx]
-                # jpath = join(RESULTS_DIR, basename(imgname) + '.json')
-                # with open(jpath, 'w') as f:
-                #     datatxt = json.dumps(resp, indent=2)
-                #     print("Wrote", len(datatxt), "bytes to", jpath)
-                #     f.write(datatxt)
+                #save to JSON file
+                imgname = image_filenames[idx]
+                jpath = join(RESULTS_DIR, basename(imgname) + '.json')
+                with open(jpath, 'w') as f:
+                    datatxt = json.dumps(resp, indent=2)
+                    print("Wrote", len(datatxt), "bytes to", jpath)
+                    f.write(datatxt)
 
                 # print the plaintext to screen for convenience
                 t = resp['textAnnotations'][0]
                 print()
                 textLst = t['description'].split("\n")
+                print(textLst)
                 textLst = textLst[2:]
 
                 question = textLst[0] + " "+textLst[1]
-                print(question)
+                #print(question)
 
                 answers = textLst[2:5]
-                print(answers)
+                #print(answers)
                 print()
                 get_ans(question, answers)
 
