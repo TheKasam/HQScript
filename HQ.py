@@ -7,6 +7,8 @@ from sys import argv
 import json
 import requests
 import bs4 as bs
+from PIL import Image
+
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 RESULTS_DIR = 'jsons'
@@ -18,7 +20,6 @@ def main():
 
     end = time.time()
     print(end - start)
-   #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
     #print(ans.json()['queries']['request'])
 
 def get_ans(question, answers):
@@ -27,7 +28,7 @@ def get_ans(question, answers):
     search_id = '016671866865682481259:ivh1ljytmsm'
     q = 'what is the epipremnum aureum house plant known as?'
     ans = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-
+    #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
     questionWord = question.strip().split(" ")[0]
 
     #other method is to get request with actual url and use bs4 to locate the answer google gives a
@@ -58,6 +59,7 @@ def get_ans(question, answers):
 def get_text():
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
     image_filename = ['imageTest.png']
+    crop_image(image_filename[0])
     if not api_key or not image_filename:
         print("""
             Please supply an api key, then one or more image filenames
@@ -117,6 +119,19 @@ def request_ocr(api_key, image_filename):
     return response
 
 
+def crop_image(name):
+    img = Image.open(name )
+    width = img.size[0]
+    height = img.size[1]
+    img2 = img.crop(
+        (
+            width - 100,
+            height - 1000,
+            width,
+            height
+        )
+    )
+    img2.save("img2.png")
 
 
 
