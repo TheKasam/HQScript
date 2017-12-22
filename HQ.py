@@ -12,19 +12,26 @@ import pyscreenshot as ImageGrab
 
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
-RESULTS_DIR = 'jsons'
-makedirs(RESULTS_DIR, exist_ok=True)
 
 def main():
+
+    #grab_image() edit values based on screen
+
     question, answers = get_text()
     ans_method_one(question, answers)
     ans_method_two(question, answers)
     ans_method_three(question, answers)
 
+
+
     end = time.time()
     print(end - start)
     #print(ans.json()['queries']['request'])
 
+def grab_image():
+    im=ImageGrab.grab(bbox=(0,20,600,510)) # X1,Y1,X2,Y2
+    im.show()
+    #ImageGrab.grab_to_file('im.png')
 def ans_method_one(question, answers):
 
     q = 'what is the epipremnum aureum house plant known as?'
