@@ -9,19 +9,21 @@ import requests
 import bs4 as bs
 from PIL import Image
 import pyscreenshot as ImageGrab
+import urllib.request
 
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 
 def main():
 
-    #grab_image() edit values based on screen
+    #grab_image() #edit values based on screen
 
     question, answers = get_text()
-    ans_method_one(question, answers)
-    ans_method_two(question, answers)
-    ans_method_three(question, answers)
-
+    # ans_method_one(question, answers)
+    # ans_method_four(question, answers)
+    # ans_method_three(question, answers)
+    # ans_method_two(question, answers)
+    ans_method_five(question, answers)
 
 
     end = time.time()
@@ -29,9 +31,9 @@ def main():
     #print(ans.json()['queries']['request'])
 
 def grab_image():
-    im=ImageGrab.grab(bbox=(0,20,600,510)) # X1,Y1,X2,Y2
+    im=ImageGrab.grab(bbox=(30,150,380,500)) # X1,Y1,X2,Y2
     im.show()
-    #ImageGrab.grab_to_file('im.png')
+    ImageGrab.grab_to_file('imageTest.png')
 def ans_method_one(question, answers):
 
     q = 'what is the epipremnum aureum house plant known as?'
@@ -42,8 +44,9 @@ def ans_method_one(question, answers):
         googleResult = requests.get('https://www.google.com/search?q='+question)
 
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
-        if soup != None:
-            headText = soup.find('div',{'class':'_sPg'})
+        headText = soup.find('div',{'class':'_sPg'})
+        if soup != None and headText != None:
+
             headText = headText.text
             headText = headText.lower()
             #print(headText)
@@ -66,48 +69,64 @@ def ans_method_one(question, answers):
                 elif  x == answers[2]:
                     freqDict[answers[2]] += 1
             print()
+            print()
+            print("Google",end=" ")
             print(freqDict)
 
+#count in api
+def ans_method_four(question, answers):
+    print("API Count")
+    search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
+    search_id = '016671866865682481259:ivh1ljytmsm'
+    #test question 1: 'what is the epipremnum aureum house plant known as?'
 
+    for ans in answers:
+        q = question + " " + ans
+
+        queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        #print(ans + ":  ")
+        #print(queryAnswer.json()['queries']['request'][0]['totalResults'])
+        print(ans + ": " + str(queryAnswer.text.lower().count(ans)))
+
+def ans_method_five(question, answers):
+    googleResult = requests.get('https://www.bing.com/search?q='+question)
+
+    soup = bs.BeautifulSoup(googleResult.text,'lxml')
+    headText = soup.find('li',{'class':"b_ans b_top b_topborder"})
+    print(soup)
+    print(headText)
+#seems to be good for which of the following
 def ans_method_two(question,answers):
     print()
     print("Number of results for each option:")
     for ans in answers:
-        question = question + " " + ans
-        googleResult = requests.get('https://www.google.com/search?q='+question)
-        soup = bs.BeautifulSoup(googleResult.text,'lxml')
+        questionTemp = question + " " + '"'+ ans + '"'
+        googleResult = requests.get('https://www.google.com/search?q='+questionTemp)
 
+        soup = bs.BeautifulSoup(googleResult.text,'lxml')
         results_num = soup.find('div',{'id':'resultStats'})
         print(ans + ": " +results_num.text.split(" ")[1])
 
-    # search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
-    # search_id = '016671866865682481259:ivh1ljytmsm'
-    # #test question 1: 'what is the epipremnum aureum house plant known as?'
-    #
-    # for ans in answers:
-    #     q = question + " " + ans
-    #
-    #     queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-    #     print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-    #     print(ans + ":  ")
-    #     print(queryAnswer.json()['queries']['request'][0]['totalResults'])
+
 
 def ans_method_three(question,answers):
 
     print()
-    print("Number of times each option appears on page")
+    print("Google Number of times each option appears on page")
     googleResult = requests.get('https://www.google.com/search?q='+question)
+
     soup = bs.BeautifulSoup(googleResult.text,'lxml')
     results_num = soup.find('div',{'id':'search'})
-
     for ans in answers:
-        print(ans + ": " + str(results_num.text.lower().count(ans)))
+
+        print(ans + ": " + str(results_num.text.replace(",","").lower().count(ans)))
 
 
 
 def get_text():
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
-    image_filename = ['imageTest.png']
+    image_filename = ['imageTest2.png']
     #crop_image(image_filename[0])
     if not api_key or not image_filename:
         print("missing key or file name")
@@ -123,12 +142,29 @@ def get_text():
                 # print the plaintext to screen for convenience
                 text = resp['textAnnotations'][0]['description']
                 textLst = text.lower().split("\n")
+                textStart = 0
 
-                question = textLst[2] + " "+textLst[3]
+                #lines of question
+                #1 line
+                if textLst[textStart][-1] == "?":
+                    question = textLst[textStart]
+                    answers = textLst[textStart+1:textStart+4]
+
+                #2lines
+                elif textLst[textStart+1][-1] == "?":
+                    question = textLst[textStart] + " "+textLst[textStart+1]
+                    answers = textLst[textStart+2:textStart+5]
+                #3lines
+                elif textLst[textStart+2][-1] == "?":
+                    question = textLst[textStart] + " "+textLst[textStart+1] +" "+textLst[textStart+2]
+                    answers = textLst[textStart+3:textStart+6]
+                else:
+                    print("error couldn't find questions")
+                    sys.exit(0)
                 print()
                 print(question)
                 print()
-                answers = textLst[4:7]
+
                 print(answers)
                 print()
                 return(question, answers)
@@ -163,21 +199,6 @@ def request_ocr(api_key, image_filename):
                              params={'key': api_key},
                              headers={'Content-Type': 'application/json'})
     return response
-
-
-def crop_image(name):
-    img = Image.open(name )
-    width = img.size[0]
-    height = img.size[1]
-    img2 = img.crop(
-        (
-            width - 100,
-            height - 1000,
-            width,
-            height
-        )
-    )
-    img2.save("img2.png")
 
 
 
