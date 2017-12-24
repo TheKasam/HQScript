@@ -1,0 +1,21 @@
+
+
+1. if options contain more thatn one work need to aplit and count
+
+2. Natural lange processing for better searchs
+
+3. Bing search results nums?
+
+4. Click on first Link
+
+5. find on wikipedia pages / only consider wikipedia?
+
+https://medium.com/@davidhariri/hacking-on-hq-trivia-b2348bb67026
+https://hackernoon.com/i-hacked-hq-trivia-but-heres-how-they-can-stop-me-68750ed16365
+
+
+
+#optimisation
+1. parallel commands
+2. pass soup?
+3. 

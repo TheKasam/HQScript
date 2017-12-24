@@ -10,39 +10,70 @@ import bs4 as bs
 from PIL import Image
 import pyscreenshot as ImageGrab
 import urllib.request
-
+import time
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
+
+
+oFile = open('test2.txt','w')
+curretQuestionResults = []
 
 def main():
 
     #grab_image() #edit values based on screen
+    oFile.write('Test1: Friday, December 15, 2017'+"\n")
+    ansLst = [2,2,1,2,1,2,2,2,0,1,2,1]
+    totalRight = 0
+    for x in range(1,13):
+        #correct answer
+        cAns = ansLst[x-1]
+        oFile.write('Q'+str(x)+": ")
+        question, answers = get_text("test2/test"+str(x)+".png")
+        ans1 = ans_method_one(question, answers, cAns)
+        ans2 = ans_method_four(question, answers, cAns)
+        ans3 = ans_method_three(question, answers, cAns)
+        ans4 = ans_method_two(question, answers, cAns)
 
-    question, answers = get_text()
-    ans_method_one(question, answers)
-    ans_method_four(question, answers)
-    ans_method_three(question, answers)
-    ans_method_two(question, answers)
-    #ans_method_five(question, answers)
+        if sum(curretQuestionResults[-4:]) > 0:
+            oFile.write(":) " + question +"\n")
+            totalRight += 1
+        else:
+            oFile.write(":( " + question + "\n")
+
+        #ans_method_five(question, answers)
 
 
     end = time.time()
     print(end - start)
     #print(ans.json()['queries']['request'])
 
+def formatAns(lst,cAns):
+    print(lst)
+    maxIndex = lst.index(max(lst))
+    indexes = [0,1,2]
+    indexes.remove(maxIndex)
+    if lst[maxIndex] == lst[indexes[0]] or lst[maxIndex] == lst[indexes[1]]:
+         oFile.write("0 ")
+         curretQuestionResults.append(0)
+    elif maxIndex == cAns:
+        oFile.write("i ")
+        curretQuestionResults.append(1)
+    else:
+        oFile.write("x ")
+        curretQuestionResults.append(-1)
 def grab_image():
     im=ImageGrab.grab(bbox=(30,150,380,500)) # X1,Y1,X2,Y2
     im.show()
     ImageGrab.grab_to_file('imageTest.png')
-def ans_method_one(question, answers):
+def ans_method_one(question, answers, cAns):
 
     q = 'what is the epipremnum aureum house plant known as?'
     questionWord = question.strip().split(" ")[0]
 
     #other method is to get request with actual url and use bs4 to locate the answer google gives a
     if True: #questionWord == 'What' or questionWord == "of":
-        googleResult = requests.get('https://www.google.com/search?q='+question)
-
+        #googleResult = requests.get('https://www.google.com/search?q='+question)
+        googleResult =  getUrlData('https://www.google.com/search?q='+question)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
         headText = soup.find('div',{'class':'_sPg'})
         if soup != None and headText != None:
@@ -60,37 +91,38 @@ def ans_method_one(question, answers):
                 freqDict[ans] = headText.count(ans)
 
 
-
-            # for x in headText:
-            #     x = x.strip(',')
-            #     print(x,end=" ")
-            #     if x == answers[0]:
-            #         freqDict[answers[0]] += 1
-            #     elif x == answers[1] :
-            #         freqDict[answers[1]] += 1
-            #     elif  x == answers[2]:
-            #         freqDict[answers[2]] += 1
-            # print()
-            # print()
             print("Google",end=" ")
             print(freqDict)
 
+            keysLst = []
+            for x in freqDict:
+                keysLst.append(freqDict[x])
+
+
+            formatAns(keysLst, cAns)
+
+        else:
+            oFile.write("0 ")
+            curretQuestionResults.append(0)
+
 #count in api
-def ans_method_four(question, answers):
+def ans_method_four(question, answers, cAns):
     print("API Count")
     search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
     search_id = '016671866865682481259:ivh1ljytmsm'
     #test question 1: 'what is the epipremnum aureum house plant known as?'
-
+    queryLst = []
     for ans in answers:
         q = question + " " + ans
 
-        queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        #queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        queryAnswer = getUrlData('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
         #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
         #print(ans + ":  ")
         #print(queryAnswer.json()['queries']['request'][0]['totalResults'])
+        queryLst.append(queryAnswer.text.lower().count(ans))
         print(ans + ": " + str(queryAnswer.text.lower().count(ans)))
-
+    formatAns(queryLst,cAns)
 def ans_method_five(question, answers):
     googleResult = requests.get('https://www.bing.com/search?q=which%20novel%20popularized%20the%20term%20%22avatar%22%20in%20the%20current%20sense%3F&qs=n&form=QBRE&sp=-1&pq=which%20novel%20popularized%20the%20term%20%22avatar%22%20in%20the%20current%20sense%3F&sc=0-63&sk=&cvid=7815A5B07F1C4576BA22296F053345FC')
 
@@ -99,40 +131,56 @@ def ans_method_five(question, answers):
     print(soup)
     print(headText)
 #seems to be good for which of the following
-def ans_method_two(question,answers):
+def ans_method_two(question,answers, cAns):
     print()
     print("Number of results for each option:")
+    queryLst = []
     for ans in answers:
         questionTemp = question + " " + '"'+ ans + '"'
-        googleResult = requests.get('https://www.google.com/search?q='+questionTemp)
-
+        #googleResult = requests.get('https://www.google.com/search?q='+questionTemp)
+        googleResult = getUrlData('https://www.google.com/search?q='+questionTemp)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
         results_num = soup.find('div',{'id':'resultStats'})
         results = results_num.text.split(" ")
+        print()
+
         if len(results) == 2:
-            print(ans + ": " +results_num.text.split(" ")[0])
+
+            strToParse = results_num.text.split(" ")[0]
+            if "," in strToParse:
+                strToParse = strToParse.replace(",","")
+            queryLst.append(float(strToParse))
+
+        elif len(results) == 3:
+
+            strToParse = results_num.text.split(" ")[1]
+            if "," in strToParse:
+                strToParse = strToParse.replace(",","")
+            queryLst.append(float(strToParse))
+
         else:
-            print(ans + ": " +results_num.text.split(" ")[1])
+            queryLst.append(0)
 
+    formatAns(queryLst,cAns)
 
-
-def ans_method_three(question,answers):
+def ans_method_three(question,answers, cAns):
 
     print()
     print("Google Number of times each option appears on page")
-    googleResult = requests.get('https://www.google.com/search?q='+question)
-
+    #googleResult = requests.get('https://www.google.com/search?q='+question)
+    googleResult = getUrlData('https://www.google.com/search?q='+question)
+    queryLst =[ ]
     soup = bs.BeautifulSoup(googleResult.text,'lxml')
     results_num = soup.find('div',{'id':'search'})
     for ans in answers:
 
         print(ans + ": " + str(results_num.text.replace(",","").lower().count(ans)))
+        queryLst.append(results_num.text.replace(",","").lower().count(ans))
+    formatAns(queryLst,cAns)
 
-
-
-def get_text():
+def get_text(imageName):
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
-    image_filename = ['test12.png']
+    image_filename = [imageName]
     #crop_image(image_filename[0])
     if not api_key or not image_filename:
         print("missing key or file name")
@@ -173,6 +221,20 @@ def get_text():
                 print()
                 return(question, answers)
 
+def getUrlData(url):
+    page = ''
+    while page == '':
+        try:
+            page = requests.get(url)
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            print("ZZzzzz...")
+            time.sleep(5)
+            print("Was a nice sleep, now let me continue...")
+            continue
+    return page
+
 def make_image_data_list(image_filename):
     """
     image_filename is a list of filename strings
@@ -198,10 +260,21 @@ def make_image_data(image_filename):
     return json.dumps({"requests": imgdict }).encode()
 
 def request_ocr(api_key, image_filename):
-    response = requests.post(ENDPOINT_URL,
-                             data=make_image_data(image_filename),
-                             params={'key': api_key},
-                             headers={'Content-Type': 'application/json'})
+    response = ""
+    while not response:
+        try:
+            response = requests.post(ENDPOINT_URL,
+                                 data=make_image_data(image_filename),
+                                 params={'key': api_key},
+                                 headers={'Content-Type': 'application/json'})
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            print("ZZzzzz...")
+            time.sleep(5)
+            print("Was a nice sleep, now let me continue...")
+            continue
+
     return response
 
 
