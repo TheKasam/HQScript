@@ -26,9 +26,12 @@ def main():
     totalRight = 0
     for x in range(1,13):
         #correct answer
-        cAns = ansLst[x-1]
+        cAns = [ansLst[x-1]]
         oFile.write('Q'+str(x)+": ")
         question, answers = get_text("test2/test"+str(x)+".png")
+        if "not" in question:
+            cAns.append("not")
+            question.replace("not","")
         ans1 = ans_method_one(question, answers, cAns)
         ans2 = ans_method_four(question, answers, cAns)
         ans3 = ans_method_three(question, answers, cAns)
@@ -47,15 +50,19 @@ def main():
     print(end - start)
     #print(ans.json()['queries']['request'])
 
+
 def formatAns(lst,cAns):
     print(lst)
-    maxIndex = lst.index(max(lst))
+    if len(cAns) ==2:
+        maxIndex = lst.index(min(lst))
+    else:
+        maxIndex = lst.index(max(lst))
     indexes = [0,1,2]
     indexes.remove(maxIndex)
     if lst[maxIndex] == lst[indexes[0]] or lst[maxIndex] == lst[indexes[1]]:
          oFile.write("0 ")
          curretQuestionResults.append(0)
-    elif maxIndex == cAns:
+    elif maxIndex == cAns[0]:
         oFile.write("i ")
         curretQuestionResults.append(1)
     else:
