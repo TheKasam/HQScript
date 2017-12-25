@@ -1,13 +1,13 @@
 Test1: Friday, December 15, 2017
-Q1: i i i i :) the audio equipment term 'hi- fi is short for what? 
-Q2: i x i i :) of the three states of matter, which keeps its own shape? 
-Q3: 0 i i i :) which pixar movie prominently featured a lot of balloons? 
-Q4: 0 i i i :) the jurisdiction of net neutrality falls under what government agency? 
-Q5: 0 i i i :) from which country does goulash originate? 
-Q6: 0 i i i :) the character of syd barrett in "legion" shares her name with the co-founder of what band? 
-Q7: 0 i i i :) which of these is the study of inscriptions? 
-Q8: 0 i 0 i :) which of these dogs is not an english breed? 
-Q9: 0 x x x :( which nathaniel hawthorne novel is written in the first- person? 
-Q10: 0 x 0 x :( which of these artists was in the original lineup of the newport folk festival? 
-Q11: 0 i 0 x :( whose resignation during the velvet revolution effectively ended communist rule in czechoslovakia? 
-Q12: 0 0 0 x :( in 1956, all-around champion viktor chukarin set which olympic gymnastics record that still stands? 
+Q1: i i i i i :) the audio equipment term 'hi- fi is short for what? 
+Q2: i i x i i :) of the three states of matter, which keeps its own shape? 
+Q3: 0 0 i i i :) which pixar movie prominently featured a lot of balloons? 
+Q4: 0 0 i i x :) the jurisdiction of net neutrality falls under what government agency? 
+Q5: 0 0 i i x :) from which country does goulash originate? 
+Q6: 0 0 i i i :) the character of syd barrett in "legion" shares her name with the co-founder of what band? 
+Q7: 0 0 i i i :) which of these is the study of inscriptions? 
+Q8: 0 0 i 0 i :) which of these dogs is not an english breed? 
+Q9: 0 0 x x x :( which nathaniel hawthorne novel is written in the first- person? 
+Q10: 0 0 x 0 i :( which of these artists was in the original lineup of the newport folk festival? 
+Q11: 0 0 i 0 x :( whose resignation during the velvet revolution effectively ended communist rule in czechoslovakia? 
+Q12: 0 0 0 0 x :( in 1956, all-around champion viktor chukarin set which olympic gymnastics record that still stands? 

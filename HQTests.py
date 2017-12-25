@@ -33,6 +33,7 @@ def main():
             cAns.append("not")
             question.replace("not","")
         ans1 = ans_method_one(question, answers, cAns)
+                #five from 1 #ans_method_five(question, answers)
         ans2 = ans_method_four(question, answers, cAns)
         ans3 = ans_method_three(question, answers, cAns)
         ans4 = ans_method_two(question, answers, cAns)
@@ -43,7 +44,6 @@ def main():
         else:
             oFile.write(":( " + question + "\n")
 
-        #ans_method_five(question, answers)
 
 
     end = time.time()
@@ -68,6 +68,7 @@ def formatAns(lst,cAns):
     else:
         oFile.write("x ")
         curretQuestionResults.append(-1)
+
 def grab_image():
     im=ImageGrab.grab(bbox=(30,150,380,500)) # X1,Y1,X2,Y2
     im.show()
@@ -83,10 +84,12 @@ def ans_method_one(question, answers, cAns):
         googleResult =  getUrlData('https://www.google.com/search?q='+question)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
         headText = soup.find('div',{'class':'_sPg'})
+        boolReturn = True
         if soup != None and headText != None:
 
             headText = headText.text
-            headText = headText.lower()
+            textPass = headText.lower()
+            headText = textPass
             #print(headText)
             headText = headText.replace(" a ","")
             headText = headText.replace(" i ","")
@@ -108,35 +111,15 @@ def ans_method_one(question, answers, cAns):
 
             formatAns(keysLst, cAns)
 
+            ans_method_five(question, answers, cAns, textPass, boolReturn)
         else:
+            boolReturn = False
             oFile.write("0 ")
             curretQuestionResults.append(0)
+            ans_method_five(question, answers, cAns, "", boolReturn )
 
-#count in api
-def ans_method_four(question, answers, cAns):
-    print("API Count")
-    search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
-    search_id = '016671866865682481259:ivh1ljytmsm'
-    #test question 1: 'what is the epipremnum aureum house plant known as?'
-    queryLst = []
-    for ans in answers:
-        q = question + " " + ans
 
-        #queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-        queryAnswer = getUrlData('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-        #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
-        #print(ans + ":  ")
-        #print(queryAnswer.json()['queries']['request'][0]['totalResults'])
-        queryLst.append(queryAnswer.text.lower().count(ans))
-        print(ans + ": " + str(queryAnswer.text.lower().count(ans)))
-    formatAns(queryLst,cAns)
-def ans_method_five(question, answers):
-    googleResult = requests.get('https://www.bing.com/search?q=which%20novel%20popularized%20the%20term%20%22avatar%22%20in%20the%20current%20sense%3F&qs=n&form=QBRE&sp=-1&pq=which%20novel%20popularized%20the%20term%20%22avatar%22%20in%20the%20current%20sense%3F&sc=0-63&sk=&cvid=7815A5B07F1C4576BA22296F053345FC')
 
-    soup = bs.BeautifulSoup(googleResult.text,'lxml')
-    headText = soup.find('li',{'class':"b_ans b_top b_topborder"})
-    print(soup)
-    print(headText)
 #seems to be good for which of the following
 def ans_method_two(question,answers, cAns):
     print()
@@ -151,7 +134,10 @@ def ans_method_two(question,answers, cAns):
         results = results_num.text.split(" ")
         print()
 
-        if len(results) == 2:
+        if  "No results found for" in googleResult.text:
+            queryLst.append(0)
+
+        elif len(results) == 2:
 
             strToParse = results_num.text.split(" ")[0]
             if "," in strToParse:
@@ -185,6 +171,42 @@ def ans_method_three(question,answers, cAns):
         queryLst.append(results_num.text.replace(",","").lower().count(ans))
     formatAns(queryLst,cAns)
 
+#count in api
+def ans_method_four(question, answers, cAns):
+    print("API Count")
+    search_key = 'AIzaSyBqcHbDxpT8KGF1dEC7glg5dq2b2H7jn7o'
+    search_id = '016671866865682481259:ivh1ljytmsm'
+    #test question 1: 'what is the epipremnum aureum house plant known as?'
+    queryLst = []
+    for ans in answers:
+        q = question + " " + ans
+
+        #queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        queryAnswer = getUrlData('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+        #print(ans + ":  ")
+        #print(queryAnswer.json()['queries']['request'][0]['totalResults'])
+        queryLst.append(queryAnswer.text.lower().count(ans))
+        print(ans + ": " + str(queryAnswer.text.lower().count(ans)))
+    formatAns(queryLst,cAns)
+
+#same sentace
+def ans_method_five(question, answers, cAns, soupTxt, boolReturn):
+    if boolReturn:
+        question = question.replace("-","")
+        soupSentence = soupTxt.split(".")
+        ansLst = [0,0,0]
+        for sentace in soupSentence:
+            for ansInx in range(len(answers)):
+                if answers[ansInx] in sentace:
+                    ansLst[ansInx] += 1
+
+        formatAns(ansLst,cAns)
+
+
+
+    else:
+        formatAns([0,0,0],cAns)
 def get_text(imageName):
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
     image_filename = [imageName]
