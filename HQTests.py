@@ -15,27 +15,28 @@ import time
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 
 
-oFile = open('test2.txt','w')
+oFile = open('test1.txt','w')
 curretQuestionResults = []
 
 def main():
 
     #grab_image() #edit values based on screen
     oFile.write('Test1: Friday, December 15, 2017'+"\n")
-    ansLst = [2,2,1,2,1,2,2,2,0,1,2,1]
+    ansLst = [0,2,0,2,1,1,0,1,0,0,2,0]
     totalRight = 0
-    for x in range(1,13):
+    for x in range(11,12):
         #correct answer
         cAns = [ansLst[x-1]]
         oFile.write('Q'+str(x)+": ")
-        question, answers = get_text("test2/test"+str(x)+".png")
+        question, answers = get_text("test1/test"+str(x)+".png")
         if "not" in question:
             cAns.append("not")
             question.replace("not","")
         ans1 = ans_method_one(question, answers, cAns)
                 #five from 1 #ans_method_five(question, answers)
         ans2 = ans_method_four(question, answers, cAns)
-        ans3 = ans_method_three(question, answers, cAns)
+        ans3 = ans_method_three(question, answers, cAns) #3 calls method6
+        #method 6
         ans4 = ans_method_two(question, answers, cAns)
 
         if sum(curretQuestionResults[-4:]) > 0:
@@ -73,28 +74,31 @@ def grab_image():
     im=ImageGrab.grab(bbox=(30,150,380,500)) # X1,Y1,X2,Y2
     im.show()
     ImageGrab.grab_to_file('imageTest.png')
+
+#Google counts options in headText
 def ans_method_one(question, answers, cAns):
 
-    q = 'what is the epipremnum aureum house plant known as?'
-    questionWord = question.strip().split(" ")[0]
+
 
     #other method is to get request with actual url and use bs4 to locate the answer google gives a
     if True: #questionWord == 'What' or questionWord == "of":
         #googleResult = requests.get('https://www.google.com/search?q='+question)
         googleResult =  getUrlData('https://www.google.com/search?q='+question)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
-        headText = soup.find('div',{'class':'_sPg'})
+        headText = soup.find('div',{'class':'_oDd'})
+
+        print(headText)
         boolReturn = True
         if soup != None and headText != None:
 
-            headText = headText.text
-            textPass = headText.lower()
-            headText = textPass
+            headText = headText.span.text.lower()
+            #textPass = headText.lower()
+            #headText = textPass
             #print(headText)
-            headText = headText.replace(" a ","")
-            headText = headText.replace(" i ","")
-            headText = headText.replace("."," ")
-
+            # headText = headText.replace(" a ","")
+            # headText = headText.replace(" i ","")
+            # headText = headText.replace("."," ")
+            #headText = [x.text.lower() for x in headText]
             freqDict = {}
             print(headText, end='\n')
             for ans in answers:
@@ -111,15 +115,14 @@ def ans_method_one(question, answers, cAns):
 
             formatAns(keysLst, cAns)
 
-            ans_method_five(question, answers, cAns, textPass, boolReturn)
+            #ans_method_five(question, answers, cAns, textPass, boolReturn)
         else:
             boolReturn = False
             oFile.write("0 ")
             curretQuestionResults.append(0)
-            ans_method_five(question, answers, cAns, "", boolReturn )
+            #ans_method_five(question, answers, cAns, "", boolReturn )
 
-
-
+#counts number of results
 #seems to be good for which of the following
 def ans_method_two(question,answers, cAns):
     print()
@@ -127,26 +130,31 @@ def ans_method_two(question,answers, cAns):
     queryLst = []
     for ans in answers:
         questionTemp = question + " " + '"'+ ans + '"'
-        #googleResult = requests.get('https://www.google.com/search?q='+questionTemp)
         googleResult = getUrlData('https://www.google.com/search?q='+questionTemp)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
         results_num = soup.find('div',{'id':'resultStats'})
-        results = results_num.text.split(" ")
-        print()
 
+
+
+        print()
+        if not results_num:
+            queryLst.append(0)
+            continue
+
+        results = results_num.text.split(" ")
         if  "No results found for" in googleResult.text:
             queryLst.append(0)
 
-        elif len(results) == 2:
+        elif len(results) == 4:
 
-            strToParse = results_num.text.split(" ")[0]
+            strToParse = results[0]
             if "," in strToParse:
                 strToParse = strToParse.replace(",","")
             queryLst.append(float(strToParse))
 
-        elif len(results) == 3:
+        elif len(results) == 5:
 
-            strToParse = results_num.text.split(" ")[1]
+            strToParse = results[1]
             if "," in strToParse:
                 strToParse = strToParse.replace(",","")
             queryLst.append(float(strToParse))
@@ -156,11 +164,11 @@ def ans_method_two(question,answers, cAns):
 
     formatAns(queryLst,cAns)
 
+#Google number of times option appears on page
 def ans_method_three(question,answers, cAns):
 
     print()
     print("Google Number of times each option appears on page")
-    #googleResult = requests.get('https://www.google.com/search?q='+question)
     googleResult = getUrlData('https://www.google.com/search?q='+question)
     queryLst =[ ]
     soup = bs.BeautifulSoup(googleResult.text,'lxml')
@@ -171,6 +179,8 @@ def ans_method_three(question,answers, cAns):
         queryLst.append(results_num.text.replace(",","").lower().count(ans))
     formatAns(queryLst,cAns)
 
+    ans_method_six( question, answers, cAns, soup)
+
 #count in api
 def ans_method_four(question, answers, cAns):
     print("API Count")
@@ -179,10 +189,12 @@ def ans_method_four(question, answers, cAns):
     #test question 1: 'what is the epipremnum aureum house plant known as?'
     queryLst = []
     for ans in answers:
-        q = question + " " + ans
+        q = question
 
         #queryAnswer = requests.get('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
         queryAnswer = getUrlData('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
+
+        #print(queryAnswer)
         #print('https://www.googleapis.com/customsearch/v1?key='+search_key+'&cx='+search_id+'&q='+q)
         #print(ans + ":  ")
         #print(queryAnswer.json()['queries']['request'][0]['totalResults'])
@@ -207,6 +219,22 @@ def ans_method_five(question, answers, cAns, soupTxt, boolReturn):
 
     else:
         formatAns([0,0,0],cAns)
+
+
+def ans_method_six(question, answers, cAns, soup):
+    links = soup.find_all('h3', {'class':'r'})
+    url = links[0].a['href']
+    print(url)
+
+    firstUrl = getUrlData(url)
+    ansCount = []
+    textUrl = firstUrl.text.lower()
+    for ans in answers:
+        print(textUrl.count(ans))
+        ansCount.append(textUrl.count(ans))
+    print("first link")
+    formatAns(ansCount,cAns)
+
 def get_text(imageName):
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
     image_filename = [imageName]
@@ -251,10 +279,12 @@ def get_text(imageName):
                 return(question, answers)
 
 def getUrlData(url):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
     page = ''
     while page == '':
         try:
-            page = requests.get(url)
+            page = requests.get(url, headers=headers)
         except:
             print("Connection refused by the server..")
             print("Let me sleep for 5 seconds")
