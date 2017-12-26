@@ -32,11 +32,17 @@ def main():
         if "not" in question:
             cAns.append("not")
             question.replace("not","")
+
+        #google head
         ans1 = ans_method_one(question, answers, cAns)
                 #five from 1 #ans_method_five(question, answers)
+        #count in api
         ans2 = ans_method_four(question, answers, cAns)
+        #count in google
         ans3 = ans_method_three(question, answers, cAns) #3 calls method6
+        #count in first url  #######geet all url######?????
         #method 6
+        #countnum of results
         ans4 = ans_method_two(question, answers, cAns)
 
         if sum(curretQuestionResults[-4:]) > 0:
@@ -92,13 +98,6 @@ def ans_method_one(question, answers, cAns):
         if soup != None and headText != None:
 
             headText = headText.span.text.lower()
-            #textPass = headText.lower()
-            #headText = textPass
-            #print(headText)
-            # headText = headText.replace(" a ","")
-            # headText = headText.replace(" i ","")
-            # headText = headText.replace("."," ")
-            #headText = [x.text.lower() for x in headText]
             freqDict = {}
             print(headText, end='\n')
             for ans in answers:
@@ -106,12 +105,9 @@ def ans_method_one(question, answers, cAns):
 
 
             print("Google",end=" ")
-            print(freqDict)
-
             keysLst = []
             for x in freqDict:
                 keysLst.append(freqDict[x])
-
 
             formatAns(keysLst, cAns)
 
@@ -133,8 +129,6 @@ def ans_method_two(question,answers, cAns):
         googleResult = getUrlData('https://www.google.com/search?q='+questionTemp)
         soup = bs.BeautifulSoup(googleResult.text,'lxml')
         results_num = soup.find('div',{'id':'resultStats'})
-
-
 
         print()
         if not results_num:
@@ -174,7 +168,7 @@ def ans_method_three(question,answers, cAns):
     soup = bs.BeautifulSoup(googleResult.text,'lxml')
     results_num = soup.find('div',{'id':'search'})
     for ans in answers:
-
+        #do i neeed replace?
         print(ans + ": " + str(results_num.text.replace(",","").lower().count(ans)))
         queryLst.append(results_num.text.replace(",","").lower().count(ans))
     formatAns(queryLst,cAns)
@@ -219,7 +213,6 @@ def ans_method_five(question, answers, cAns, soupTxt, boolReturn):
 
     else:
         formatAns([0,0,0],cAns)
-
 
 def ans_method_six(question, answers, cAns, soup):
     links = soup.find_all('h3', {'class':'r'})
