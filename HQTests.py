@@ -11,11 +11,14 @@ from PIL import Image
 import pyscreenshot as ImageGrab
 import urllib.request
 import time
+import wikipedia
+import spacy
+
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 
 
-oFile = open('test1.txt','w')
+oFile = open('test1.2.txt','w')
 curretQuestionResults = []
 
 def main():
@@ -34,16 +37,17 @@ def main():
             question.replace("not","")
 
         #google head
-        ans1 = ans_method_one(question, answers, cAns)
+        #ans1 = ans_method_one(question, answers, cAns)
                 #five from 1 #ans_method_five(question, answers)
         #count in api
-        ans2 = ans_method_four(question, answers, cAns)
+        #ans2 = ans_method_four(question, answers, cAns)
         #count in google
-        ans3 = ans_method_three(question, answers, cAns) #3 calls method6
+        #ans3 = ans_method_three(question, answers, cAns) #3 calls method6
         #count in first url  #######geet all url######?????
         #method 6
         #countnum of results
-        ans4 = ans_method_two(question, answers, cAns)
+        #ans4 = ans_method_two(question, answers, cAns)
+        ans7 = ans_method_seven(question, answers, cAns)
 
         if sum(curretQuestionResults[-4:]) > 0:
             oFile.write(":) " + question +"\n")
@@ -214,6 +218,8 @@ def ans_method_five(question, answers, cAns, soupTxt, boolReturn):
     else:
         formatAns([0,0,0],cAns)
 
+
+#getting first link
 def ans_method_six(question, answers, cAns, soup):
     links = soup.find_all('h3', {'class':'r'})
     url = links[0].a['href']
@@ -226,6 +232,38 @@ def ans_method_six(question, answers, cAns, soup):
         print(textUrl.count(ans))
         ansCount.append(textUrl.count(ans))
     print("first link")
+    formatAns(ansCount,cAns)
+
+def ans_method_seven(question, answers, cAns):
+    print("method 7")
+    nlp = spacy.load('en')
+
+    question_lst = nlp(question[:-1])
+    for word in question:
+        print(type(word))
+        if word.is_stop:
+            question_lst.remove(word)
+
+    wiki_results_lst = []
+    ansCount = []
+
+    for answer in answers:
+        sites = wikipedia.search(answer)
+        site = sites[0] if len(records) else ""
+
+        if site != "":
+            wiki_results_lst.append(site.content)
+
+    for site_txt in wiki_results_lst:
+        question_word_count = 0
+
+        for word in question_lst:
+            question_word_count += site_txt.count(word)
+
+        word_count_percent = question_word_count / len(site_txt.split(" "))
+        ansCount.append(word_count_percent)
+
+
     formatAns(ansCount,cAns)
 
 def get_text(imageName):
