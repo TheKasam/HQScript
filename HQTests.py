@@ -18,20 +18,20 @@ import spacy
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 
 
-oFile = open('test1.4.txt','w')
+# oFile = open('test1.4.txt','w')
 curretQuestionResults = []
 
 def main():
-
+    grab_image()
     #grab_image() #edit values based on screen
-    oFile.write('Test1: Friday, December 15, 2017'+"\n")
+    #oFile.write('Test1: Friday, December 15, 2017'+"\n")
     ansLst = [2,2,1,2,1,2,2,2,0,1,2,1]
     totalRight = 0
-    for x in range(1,13):
+    for x in range(1,2):
         #correct answer
         cAns = [ansLst[x-1]]
-        oFile.write('Q'+str(x)+": ")
-        question, answers = get_text("test2/test"+str(x)+".png")
+       # oFile.write('Q'+str(x)+": ")
+        question, answers = get_text("test3/test"+str(x)+".png")
         if "not" in question:
             cAns.append("not")
             question.replace("not","")
@@ -49,44 +49,46 @@ def main():
         ans4 = ans_method_two(question, answers, cAns)
         #ans7 = ans_method_seven(question, answers, cAns)
 
-        if sum(curretQuestionResults[-6:]) > 0:
-            oFile.write(":) " + question +"\n")
-            totalRight += 1
-        else:
-            oFile.write(":( " + question + "\n")
+        # if sum(curretQuestionResults[-6:]) > 0:
+        #     oFile.write(":) " + question +"\n")
+        #     totalRight += 1
+        # else:
+        #     oFile.write(":( " + question + "\n")
 
 
-
+    print(formatDef)
     end = time.time()
     print(end - start)
     #print(ans.json()['queries']['request'])
 
-
+formatDef = []
 def formatAns(lst,cAns):
     print(lst)
     if len(cAns) ==2:
         maxIndex = lst.index(min(lst))
     else:
         maxIndex = lst.index(max(lst))
-    indexes = [0,1,2]
-    indexes.remove(maxIndex)
-    print(indexes)
-    print(maxIndex)
-    print(lst)
-    if lst[maxIndex] == lst[indexes[0]] or lst[maxIndex] == lst[indexes[1]]:
-         oFile.write("0 ")
-         curretQuestionResults.append(0)
-    elif maxIndex == cAns[0]:
-        oFile.write("i ")
-        curretQuestionResults.append(1)
-    else:
-        oFile.write("x ")
-        curretQuestionResults.append(-1)
+    formatDef.append(maxIndex)
+    # indexes = [0,1,2]
+    # indexes.remove(maxIndex)
+    # print(indexes)
+    # print(maxIndex)
+    # print(lst)
+    # if lst[maxIndex] == lst[indexes[0]] or lst[maxIndex] == lst[indexes[1]]:
+    #      oFile.write("0 ")
+    #      curretQuestionResults.append(0)
+    # elif maxIndex == cAns[0]:
+    #     oFile.write("i ")
+    #     curretQuestionResults.append(1)
+    # else:
+    #     oFile.write("x ")
+    #     curretQuestionResults.append(-1)
+    print(maxIndex+1)
 
 def grab_image():
-    im=ImageGrab.grab(bbox=(30,150,380,500)) # X1,Y1,X2,Y2
+    im=ImageGrab.grab(bbox=(0,150,380,500)) # X1,Y1,X2,Y2
     im.show()
-    ImageGrab.grab_to_file('imageTest.png')
+    im.save("test3/test1.png", "PNG")
 
 #Google counts options in headText
 def ans_method_one(question, answers, cAns):
@@ -121,7 +123,7 @@ def ans_method_one(question, answers, cAns):
             #ans_method_five(question, answers, cAns, textPass, boolReturn)
         else:
             boolReturn = False
-            oFile.write("0 ")
+            #oFile.write("0 ")
             curretQuestionResults.append(0)
             #ans_method_five(question, answers, cAns, "", boolReturn )
 
