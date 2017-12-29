@@ -18,38 +18,38 @@ import spacy
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
 
 
-oFile = open('test1.2.txt','w')
+oFile = open('test1.4.txt','w')
 curretQuestionResults = []
 
 def main():
 
     #grab_image() #edit values based on screen
     oFile.write('Test1: Friday, December 15, 2017'+"\n")
-    ansLst = [0,2,0,2,1,1,0,1,0,0,2,0]
+    ansLst = [2,2,1,2,1,2,2,2,0,1,2,1]
     totalRight = 0
-    for x in range(11,12):
+    for x in range(1,13):
         #correct answer
         cAns = [ansLst[x-1]]
         oFile.write('Q'+str(x)+": ")
-        question, answers = get_text("test1/test"+str(x)+".png")
+        question, answers = get_text("test2/test"+str(x)+".png")
         if "not" in question:
             cAns.append("not")
             question.replace("not","")
-
+        question = question.replace(",","")
         #google head
-        #ans1 = ans_method_one(question, answers, cAns)
+        ans1 = ans_method_one(question, answers, cAns)
                 #five from 1 #ans_method_five(question, answers)
         #count in api
-        #ans2 = ans_method_four(question, answers, cAns)
+        ans2 = ans_method_four(question, answers, cAns)
         #count in google
-        #ans3 = ans_method_three(question, answers, cAns) #3 calls method6
+        ans3 = ans_method_three(question, answers, cAns) #3 calls method6
         #count in first url  #######geet all url######?????
         #method 6
         #countnum of results
-        #ans4 = ans_method_two(question, answers, cAns)
-        ans7 = ans_method_seven(question, answers, cAns)
+        ans4 = ans_method_two(question, answers, cAns)
+        #ans7 = ans_method_seven(question, answers, cAns)
 
-        if sum(curretQuestionResults[-4:]) > 0:
+        if sum(curretQuestionResults[-6:]) > 0:
             oFile.write(":) " + question +"\n")
             totalRight += 1
         else:
@@ -70,6 +70,9 @@ def formatAns(lst,cAns):
         maxIndex = lst.index(max(lst))
     indexes = [0,1,2]
     indexes.remove(maxIndex)
+    print(indexes)
+    print(maxIndex)
+    print(lst)
     if lst[maxIndex] == lst[indexes[0]] or lst[maxIndex] == lst[indexes[1]]:
          oFile.write("0 ")
          curretQuestionResults.append(0)
@@ -238,33 +241,62 @@ def ans_method_seven(question, answers, cAns):
     print("method 7")
     nlp = spacy.load('en')
 
-    question_lst = nlp(question[:-1])
-    for word in question:
+    question_lst = []
+    question_lst_nlp = nlp(question[:-2])
+    for word in question_lst_nlp:
         print(type(word))
-        if word.is_stop:
-            question_lst.remove(word)
+        print(word)
+        if not word.is_stop:
+            question_lst.append(word.text)
+
+    question_lst = filter(lambda a: a != '"', question_lst)
+    question_lst = set(question_lst)
+
 
     wiki_results_lst = []
     ansCount = []
 
     for answer in answers:
         sites = wikipedia.search(answer)
-        site = sites[0] if len(records) else ""
+        print(answer)
+        site = sites[0] if len(sites) else ""
 
         if site != "":
-            wiki_results_lst.append(site.content)
+            try:
+                site = wikipedia.page(site)
+            except wikipedia.exceptions.DisambiguationError as e:
+                print(type(format(e)))
+                e = format(e).split("\n")
+                e = e[1:]
+                for line in e:
+                    line = line.lower()
+                    print(line)
+                    if line.count(answer) > 0:
+                        site = wikipedia.page(line)
+                        break
 
+            wiki_results_lst.append(site.content)
+        else:
+            wiki_results_lst.append("")
+    count = 0
     for site_txt in wiki_results_lst:
+        count += 1
         question_word_count = 0
 
         for word in question_lst:
+
             question_word_count += site_txt.count(word)
 
         word_count_percent = question_word_count / len(site_txt.split(" "))
+        print(count)
+        # if count == 2:
+        #     print(site_txt)
         ansCount.append(word_count_percent)
 
 
     formatAns(ansCount,cAns)
+    print(question)
+    print(question_lst)
 
 def get_text(imageName):
     api_key = 'AIzaSyD62V5CUucbPUnx21i-cQvKS9cOngm2eeI'
